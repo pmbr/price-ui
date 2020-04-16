@@ -12,15 +12,25 @@ class App extends Component {
     ]
   }
 
+  deleteProductHandler = (index) => {
+    const products = [...this.state.products]
+    products.splice(index, 1);
+    this.setState({ products: products }) 
+  }
+
   render() {
     return (
       <div className="App">
         Welcome to Price UI
         {this.state.products
-          .filter(p => p.price > 0)
-          .map(p => 
+          .filter(product => product.price > 0)
+          .map((product, index) => 
             {
-              return <Product description={p.description} price={p.price} />   ;
+              return <div>
+                      <Product description={product.description} price={product.price} />
+                      <button>Edit</button>
+                      <button onClick={() => this.deleteProductHandler(index)}>Delete</button>
+                    </div>;
             })
         }
          
