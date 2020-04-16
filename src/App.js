@@ -6,15 +6,25 @@ class App extends Component {
 
   state = {
     products: [
-      { id: 1, description: "t-shirt", price: 1.01 },
-      { id: 2, description: "shorts", price: 2.99 },
-      { id: 3, description: "polo", price: 0 }
+      { id: 1, description: "t-shirt", price: 1.01, maxDiscount: 0.5 },
+      { id: 2, description: "shorts", price: 2.99, maxDiscount: 0.3 },
+      { id: 3, description: "polo", price: 0, maxDiscount: 0}
     ]
   }
 
   deleteProductHandler = (index) => {
     const products = [...this.state.products]
     products.splice(index, 1);
+    this.setState({ products: products }) 
+  }
+
+  applyDiscountHandler = (index) => {
+    const products = [...this.state.products]
+    const product = {
+      ...this.state.products[index]
+    }
+    product.price = product.price * (1 - product.maxDiscount)
+    products[index] = product;
     this.setState({ products: products }) 
   }
 
@@ -26,18 +36,16 @@ class App extends Component {
           .filter(product => product.price > 0)
           .map((product, index) => 
             {
-              return <div key={product.id}>
-                      <Product 
+              return <Product 
+                          key={product.id}
                           description={product.description} 
                           price={product.price} 
+                          maxDiscount={product.maxDiscount}
+                          delete={() => this.deleteProductHandler(index)}
+                          applyDiscount={() => this.applyDiscountHandler(index, product.maxDiscount)}
                         />
-                      <button>Edit</button>
-                      <button onClick={() => this.deleteProductHandler(index)}>Delete</button>
-                    </div>;
             })
         }
-         
-         
       </div>
     );    
   }
