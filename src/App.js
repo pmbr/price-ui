@@ -6,9 +6,9 @@ class App extends Component {
 
   state = {
     products: [
-      { description: "t-shirt", price: 1.01 },
-      { description: "shorts", price: 2.99 },
-      { description: "polo", price: 0 }
+      { id: 1, description: "t-shirt", price: 1.01 },
+      { id: 2, description: "shorts", price: 2.99 },
+      { id: 3, description: "polo", price: 0 }
     ]
   }
 
@@ -26,8 +26,11 @@ class App extends Component {
           .filter(product => product.price > 0)
           .map((product, index) => 
             {
-              return <div>
-                      <Product description={product.description} price={product.price} />
+              return <div key={product.id}>
+                      <Product 
+                          description={product.description} 
+                          price={product.price} 
+                        />
                       <button>Edit</button>
                       <button onClick={() => this.deleteProductHandler(index)}>Delete</button>
                     </div>;
