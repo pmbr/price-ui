@@ -17,6 +17,12 @@ type Product struct {
 	MaxDiscount float32  `json:"maxDiscount"` 
 }
 
+type Error struct { 
+	ErrorCode    int    `json:"errorCode"` 
+	ErrorMessage string `json:"errorMessage"` 
+	ErrorDetails string `json:"errorDetails"` 
+}
+
 var product1 Product = Product {
 				Id: 1, 
 				Description: "Blue Jeans", 
@@ -41,43 +47,55 @@ var product3 Product = Product {
 var products = []Product { product1, product2, product3, }
 
 func getAll(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "application/json")
-    w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-    w.Header().Set("Access-Control-Allow-Credentials", "true")
-
+    addResponseHeaders(w)
     w.WriteHeader(http.StatusOK)
-
     json.NewEncoder(w).Encode(products) 
 }
 
 func get(w http.ResponseWriter, r *http.Request) {
+	addResponseHeaders(w)
     if id, ok := extractIdFromPathParams(w, r); ok {
-	    log.Print("get id ", id)
-
-	    w.Header().Set("Content-Type", "application/json")
-    	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-    	w.WriteHeader(http.StatusOK)
-    	w.Write([]byte(`{"message": "get called"}`))
+		for _, product := range products {
+			if (product.Id == id) {
+		    	w.WriteHeader(http.StatusOK)
+    			json.NewEncoder(w).Encode(product) 
+	    		log.Print("get returned id ", id)
+    			return;
+			}
+		}
+		log.Print("get found no id ", id)
+    	w.WriteHeader(http.StatusNotFound)    	
+    	json.NewEncoder(w).Encode( Error { ErrorMessage: "no price found for id" })
     }
 }
 
 func post(w http.ResponseWriter, r *http.Request) {
+	addResponseHeaders(w)
     w.WriteHeader(http.StatusCreated)
 }
 
 func put(w http.ResponseWriter, r *http.Request) {
+	addResponseHeaders(w)
     if id, ok := extractIdFromPathParams(w, r); ok {
 	    log.Print("updated id ", id)
-
     	w.WriteHeader(http.StatusOK)
     }
 }
 
 func delete(w http.ResponseWriter, r *http.Request) {
+	addResponseHeaders(w)
     if id, ok := extractIdFromPathParams(w, r); ok {
-	    log.Print("deleted id ", id)
-
-    	w.WriteHeader(http.StatusOK)
+		for index, product := range products {
+			if (product.Id == id) {
+				products = append(products[:index], products[index+1:]...)
+		    	w.WriteHeader(http.StatusOK)
+			    log.Print("deleted id ", id)
+    			return;
+			}
+		}
+		log.Print("delete found no id ", id)
+    	w.WriteHeader(http.StatusNotFound)    	
+    	json.NewEncoder(w).Encode( Error { ErrorMessage: "no price found for id" })
     }
 }
 
@@ -99,30 +117,29 @@ func main() {
 }
 
 func extractIdFromPathParams(w http.ResponseWriter, r *http.Request) (int, bool) {
-
 	pathParams := mux.Vars(r)
-
     id := -1
-
     var err error
     if val, ok := pathParams["id"]; ok {
         id, err = strconv.Atoi(val)
         if err != nil {
-    		w.Header().Set("Content-Type", "application/json")
             w.WriteHeader(http.StatusInternalServerError)
-            w.Write([]byte(`{"error": "id invalid"}`))
+	    	json.NewEncoder(w).Encode( Error { ErrorMessage: "id invalid" })
             log.Print("received request with invalid id ", val)
             return -1, false
         }
     } else {
-		w.Header().Set("Content-Type", "application/json")
         w.WriteHeader(http.StatusInternalServerError)
-        w.Write([]byte(`{"error": "id required"}`))
+	    json.NewEncoder(w).Encode( Error { ErrorMessage: "id required" })
         log.Print("received request with id missing")
         return -1, false
 
     }
-
     return id, true
+}
 
+func addResponseHeaders(w http.ResponseWriter) {
+    w.Header().Set("Content-Type", "application/json")
+    w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+    w.Header().Set("Access-Control-Allow-Credentials", "true")	
 }
