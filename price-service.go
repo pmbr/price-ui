@@ -1,43 +1,43 @@
 package main
 
 import (
-    "fmt"
-    "log"
+	"fmt"
+	"log"
 	"strconv"
 
-    "net/http"
+	"net/http"
 	"encoding/json"
 
-    "github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 )
 
 type Product struct { 
-     Id          int      `json:"id"` 
-     Description string   `json:"description"` 
-     Price       float32  `json:"price"` 
-     MaxDiscount float32  `json:"maxDiscount"` 
+	Id          int      `json:"id"` 
+	Description string   `json:"description"` 
+	Price       float32  `json:"price"` 
+	MaxDiscount float32  `json:"maxDiscount"` 
 }
 
 var product1 Product = Product {
-                Id: 1, 
-                Description: "Blue Jeans", 
-                Price: 1.01, 
-                MaxDiscount: 0.5,
-             }
+				Id: 1, 
+				Description: "Blue Jeans", 
+				Price: 1.01, 
+				MaxDiscount: 0.5,
+			}
 
 var product2 Product = Product {
-                Id: 2, 
-                Description: "Green T-Shirt", 
-                Price: 2.99,
-                MaxDiscount: 0.3,
-             } 
+				Id: 2, 
+				Description: "Green T-Shirt", 
+				Price: 2.99,
+				MaxDiscount: 0.3,
+			} 
 
 var product3 Product = Product {
-                Id: 3, 
-                Description: "White Skirt", 
-                Price: 0, 
-                MaxDiscount: 0,
-             } 
+				Id: 3, 
+				Description: "White Skirt", 
+				Price: 0, 
+				MaxDiscount: 0,
+			} 
 
 var products = []Product { product1, product2, product3, }
 

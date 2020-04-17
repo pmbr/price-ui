@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+import priceService from './priceService';
 
 import './App.css';
 import Product from './Model/Product';
@@ -7,14 +7,17 @@ import Product from './Model/Product';
 class App extends Component {
 
   state = {
-    products: []
+    products: [],
+    serviceError: false
   }
 
   componentDidMount() {
-    axios
-      .get('http://localhost:8080/')
+    priceService
+      .get('/')
       .then(response => {
-        this.setState({ products: response.data }) 
+        this.setState({ products: response.data, serviceError: false });
+      }).catch(error => {
+        this.setState({ serviceError: true });
       });
   }
 
@@ -35,10 +38,11 @@ class App extends Component {
   }
 
   render() {
-    return (
-      <div className="App">
-        Welcome to Price UI
-        {this.state.products
+    let content = null;
+    if (this.state.serviceError) {
+      content = <p>Price UI could not retrieve prices from price-service. Check if price-service is up and running.</p>
+    } else {
+      content = this.state.products
           .filter(product => product.price > 0)
           .map((product, index) => 
             {
@@ -50,8 +54,12 @@ class App extends Component {
                           delete={() => this.deleteProductHandler(index)}
                           applyDiscount={() => this.applyDiscountHandler(index, product.maxDiscount)}
                         />
-            })
-        }
+            });
+    }
+    return (
+      <div className="App">
+        Welcome to Price UI
+        {content}
       </div>
     );    
   }
