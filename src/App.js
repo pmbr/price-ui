@@ -1,15 +1,21 @@
 import React, { Component } from 'react';
+import axios from 'axios';
+
 import './App.css';
-import Product from './Model/Product'
+import Product from './Model/Product';
 
 class App extends Component {
 
   state = {
-    products: [
-      { id: 1, description: "t-shirt", price: 1.01, maxDiscount: 0.5 },
-      { id: 2, description: "shorts", price: 2.99, maxDiscount: 0.3 },
-      { id: 3, description: "polo", price: 0, maxDiscount: 0}
-    ]
+    products: []
+  }
+
+  componentDidMount() {
+    axios
+      .get('http://localhost:8080/')
+      .then(response => {
+        this.setState({ products: response.data }) 
+      });
   }
 
   deleteProductHandler = (index) => {
