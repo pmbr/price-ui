@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"strconv"
 
@@ -52,33 +51,14 @@ func getAll(w http.ResponseWriter, r *http.Request) {
 }
 
 func get(w http.ResponseWriter, r *http.Request) {
+    if id, ok := extractIdFromPathParams(w, r); ok {
+	    log.Print("get id ", id)
 
-	pathParams := mux.Vars(r)
-
-    id := -1
-    var err error
-    if val, ok := pathParams["id"]; ok {
-        id, err = strconv.Atoi(val)
-        if err != nil {
-    		w.Header().Set("Content-Type", "application/json")
-            w.WriteHeader(http.StatusInternalServerError)
-            w.Write([]byte(`{"error": "id invalid"}`))
-            return
-        }
-    } else {
-		w.Header().Set("Content-Type", "application/json")
-        w.WriteHeader(http.StatusInternalServerError)
-        w.Write([]byte(`{"error": "id required"}`))
-        return
-
+	    w.Header().Set("Content-Type", "application/json")
+    	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+    	w.WriteHeader(http.StatusOK)
+    	w.Write([]byte(`{"message": "get called"}`))
     }
-
-    fmt.Print("get id", id)
-
-    w.Header().Set("Content-Type", "application/json")
-    w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte(`{"message": "get called"}`))
 }
 
 func post(w http.ResponseWriter, r *http.Request) {
@@ -86,55 +66,19 @@ func post(w http.ResponseWriter, r *http.Request) {
 }
 
 func put(w http.ResponseWriter, r *http.Request) {
-	pathParams := mux.Vars(r)
+    if id, ok := extractIdFromPathParams(w, r); ok {
+	    log.Print("updated id ", id)
 
-    id := -1
-    var err error
-    if val, ok := pathParams["id"]; ok {
-        id, err = strconv.Atoi(val)
-        if err != nil {
-    		w.Header().Set("Content-Type", "application/json")
-            w.WriteHeader(http.StatusInternalServerError)
-            w.Write([]byte(`{"error": "id invalid"}`))
-            return
-        }
-    } else {
-		w.Header().Set("Content-Type", "application/json")
-        w.WriteHeader(http.StatusInternalServerError)
-        w.Write([]byte(`{"error": "id required"}`))
-        return
-
+    	w.WriteHeader(http.StatusOK)
     }
-
-    fmt.Print("update id", id)
-
-    w.WriteHeader(http.StatusAccepted)
 }
 
 func delete(w http.ResponseWriter, r *http.Request) {
-	pathParams := mux.Vars(r)
+    if id, ok := extractIdFromPathParams(w, r); ok {
+	    log.Print("deleted id ", id)
 
-    id := -1
-    var err error
-    if val, ok := pathParams["id"]; ok {
-        id, err = strconv.Atoi(val)
-        if err != nil {
-    		w.Header().Set("Content-Type", "application/json")
-            w.WriteHeader(http.StatusInternalServerError)
-            w.Write([]byte(`{"error": "id invalid"}`))
-            return
-        }
-    } else {
-		w.Header().Set("Content-Type", "application/json")
-        w.WriteHeader(http.StatusInternalServerError)
-        w.Write([]byte(`{"error": "id required"}`))
-        return
-
+    	w.WriteHeader(http.StatusOK)
     }
-
-    log.Print("delete id", id)
-
-    w.WriteHeader(http.StatusOK)
 }
 
 func notFound(w http.ResponseWriter, r *http.Request) {
@@ -152,4 +96,33 @@ func main() {
     r.HandleFunc("/", notFound)
 
     log.Fatal(http.ListenAndServe("localhost:8080", r))
+}
+
+func extractIdFromPathParams(w http.ResponseWriter, r *http.Request) (int, bool) {
+
+	pathParams := mux.Vars(r)
+
+    id := -1
+
+    var err error
+    if val, ok := pathParams["id"]; ok {
+        id, err = strconv.Atoi(val)
+        if err != nil {
+    		w.Header().Set("Content-Type", "application/json")
+            w.WriteHeader(http.StatusInternalServerError)
+            w.Write([]byte(`{"error": "id invalid"}`))
+            log.Print("received request with invalid id ", val)
+            return -1, false
+        }
+    } else {
+		w.Header().Set("Content-Type", "application/json")
+        w.WriteHeader(http.StatusInternalServerError)
+        w.Write([]byte(`{"error": "id required"}`))
+        log.Print("received request with id missing")
+        return -1, false
+
+    }
+
+    return id, true
+
 }
