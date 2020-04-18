@@ -14,7 +14,7 @@ const price = (props) => {
 		<br/>
 		<button onClick={props.applyDiscount}>Apply {props.maxDiscount * 100}% OFF</button>
 		<br/>
-		<button>Edit</button>
+		<a href="/edit-price/1">Edit</a>
 		<br/>
 		<button onClick={props.delete}>Delete</button>
     </div>
