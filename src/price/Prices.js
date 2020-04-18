@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import priceService from './priceService';
 
-import './App.css';
+import '../App.css';
 import Price from './Price';
 
 class prices extends Component {
-
+  
   state = {
     prices: [],
     serviceError: false
@@ -37,18 +37,22 @@ class prices extends Component {
     this.setState({ prices: prices }) 
   }
 
+  newPriceHandler = () => {
+    this.props.history.push("/new-price");
+  }
+
   render() {
     let messages = null;
     let navbar = null;
     let prices = null;
     if (this.state.serviceError) {
-		messages = <p>Price UI could not retrieve prices from price-service. Check if price-service is up and running.</p>
+      messages = <p>Price UI could not retrieve prices from price-service. Check if price-service is up and running.</p>
     } else {
       navbar =     
 				<ul className="Nav">
-					<li><a href="/new-price">New Price</a></li>
-					<li><a>Delete All</a></li>
-          		</ul>;
+					<li><button onClick={() => this.newPriceHandler()} >New Price</button></li>
+					<li><button>Delete All</button></li>
+        </ul>;
 	
       prices = this.state.prices
           .filter(price => price.price > 0)
@@ -69,10 +73,10 @@ class prices extends Component {
     }
     return (
     	<div>
-                {messages}
-                {navbar}
-                {prices}
-        </div>
+        {messages}
+        {navbar}
+        {prices}
+      </div>
     );    
   }
 
