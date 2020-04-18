@@ -1,12 +1,16 @@
 import React from 'react';
 
-const product = (props) => {
+const price = (props) => {
   return (
-    <div>
+    <div className="Price">
 		<br/>
 		Product: {props.description}
 		<br/>
 		Price: {props.price}
+		<br/>
+		Start date: {props.startDate}
+		<br/>
+		End date: {props.endDate}
 		<br/>
 		<button onClick={props.applyDiscount}>Apply {props.maxDiscount * 100}% OFF</button>
 		<br/>
@@ -17,4 +21,4 @@ const product = (props) => {
   );
 }
 
-export default product;
+export default price;

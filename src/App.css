@@ -36,3 +36,16 @@
     transform: rotate(360deg);
   }
 }
+
+.Price {
+  border-style: solid;
+}
+
+.Nav {
+  list-style: none;
+}
+
+.Nav li {
+  display: inline-block;
+  margin: 5px;
+}

@@ -10,11 +10,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type Product struct { 
-	Id		  int	  `json:"id"` 
-	Description string   `json:"description"` 
-	Price	   float32  `json:"price"` 
-	MaxDiscount float32  `json:"maxDiscount"` 
+type Price struct { 
+	Id                 int      `json:"id"` 
+	ProductId          int      `json:"productId"` 
+	ProductDescription string   `json:"productDescription"` 
+	Price              float32  `json:"price"` 
+	StartDate          string   `json:"startDate"` 
+	EndDate            string   `json:"endDate"` 
+	MaxDiscount        float32  `json:"maxDiscount"` 
 }
 
 type Error struct { 
@@ -23,42 +26,61 @@ type Error struct {
 	ErrorDetails string `json:"errorDetails"` 
 }
 
-var product1 Product = Product {
-				Id: 1, 
-				Description: "Blue Jeans", 
+var price1 Price = Price {
+				Id: 1,	   
+				ProductId: 10, 
+				ProductDescription: "Blue Jeans", 
 				Price: 1.01, 
+				StartDate: "05/31/2020",
+				EndDate: "06/18/2020",
 				MaxDiscount: 0.5,
 			}
 
-var product2 Product = Product {
-				Id: 2, 
-				Description: "Green T-Shirt", 
+var price2 Price = Price {
+				Id: 2,
+				ProductId: 20, 
+				ProductDescription: "Green T-Shirt", 
 				Price: 2.99,
+				StartDate: "01/01/2020",
+				EndDate: "12/31/2020",
 				MaxDiscount: 0.3,
 			} 
 
-var product3 Product = Product {
-				Id: 3, 
-				Description: "White Skirt", 
+var price3 Price = Price {
+				Id: 3,
+				ProductId: 30, 
+				ProductDescription: "White Skirt", 
 				Price: 0, 
+				StartDate: "",
+				EndDate: "",
 				MaxDiscount: 0,
 			} 
 
-var products = []Product { product1, product2, product3, }
+var price4 Price = Price {
+				Id: 4, 
+				ProductId: 10, 
+				ProductDescription: "Blue Jeans", 
+				Price: 1.67, 
+				StartDate: "06/19/2020",
+				EndDate: "06/30/2020",
+				MaxDiscount: 0,
+			} 
+
+var prices = []Price { price1, price2, price3, price4, }
 
 func getAll(w http.ResponseWriter, r *http.Request) {
 	addResponseHeaders(w)
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(products) 
+	json.NewEncoder(w).Encode(prices) 
 }
 
 func get(w http.ResponseWriter, r *http.Request) {
 	addResponseHeaders(w)
 	if id, ok := extractIdFromPathParams(w, r); ok {
-		for _, product := range products {
-			if (product.Id == id) {
+		for _, price := range prices {
+			if (price.Id == id) {
 				w.WriteHeader(http.StatusOK)
-				json.NewEncoder(w).Encode(product) 
+				json.NewEncoder(w).Encode(price) 
 				log.Print("get returned id ", id)
 				return;
 			}
@@ -85,9 +107,9 @@ func put(w http.ResponseWriter, r *http.Request) {
 func delete(w http.ResponseWriter, r *http.Request) {
 	addResponseHeaders(w)
 	if id, ok := extractIdFromPathParams(w, r); ok {
-		for index, product := range products {
-			if (product.Id == id) {
-				products = append(products[:index], products[index+1:]...)
+		for index, price := range prices {
+			if (price.Id == id) {
+				prices = append(prices[:index], prices[index+1:]...)
 				w.WriteHeader(http.StatusOK)
 				log.Print("deleted id ", id)
 				return;
