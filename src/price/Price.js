@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom'
+import { connect } from 'react-redux'
 
 class price extends Component {
 
 	editPriceHandler = (id) => {
+		this.props.onAnyValueChange(this.props.id)
 		this.props.history.push("/edit-price/" + this.props.id);
 	}
 
@@ -30,4 +32,16 @@ class price extends Component {
 	
 }
 
-export default withRouter(price);
+const mapStateToProps = (state) => {
+	return {
+		value: state.anyValue
+	};
+}
+
+const mapDispatchToProps = (dispatch) => {
+	return {
+		onAnyValueChange: (val) => dispatch({type: "CHANGE", newValue: val})
+	}
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(price));
