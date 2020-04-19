@@ -32,18 +32,24 @@ class editprice extends Component {
 			message = <p>Price UI could not retrieve price from price-service. Check if price-service is up and running.</p>
 		} else if (this.state.price) {
 			message = null;
-			price = 			
-				<div className="EditPrice">
-					Product: {this.state.price.productDescription}
-					<br/>
-					Price: {this.state.price.price}
-					<br/>
-					Start date: {this.state.price.startDate}
-					<br/>
-					End date: {this.state.price.endDate}					
-					<br/>
-				</div>
-				savebutton = <button>Save</button>;
+			price = 
+				<form onSubmit={this.saveHandler}>
+					<div className="EditPrice">
+						Product Id:  <input defaultValue={this.state.price.productId} />
+						<br/>
+						Product description:  <input defaultValue={this.state.price.productDescription} />
+						<br/>
+						Price: <input defaultValue={this.state.price.price} />
+						<br/>
+						Start date: <input defaultValue={this.state.price.startDate} /> 
+						<br/>
+						End date: <input defaultValue={this.state.price.endDate} /> 
+						<br/>
+						Max discount: <input defaultValue={this.state.price.maxDiscount} /> 
+						<br/>
+					</div>
+				</form>
+				savebutton = <button type="Success">Save</button>;
 		}
 		let navbar = 
 			<div>

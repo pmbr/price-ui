@@ -50,7 +50,19 @@
 }
 
 .EditPrice {
-  width: 250px;
+  width: 350px;
+  padding: 16px;
+  text-align: center;
+  border: 1px solid #eee;
+  box-shadow: 0 2px 3p x#ccc;
+  margin: 10px;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.NewPrice {
+  width: 350px;
   padding: 16px;
   text-align: center;
   border: 1px solid #eee;

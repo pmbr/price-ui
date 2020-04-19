@@ -10,7 +10,9 @@ class price extends Component {
 	render() {
 		return (		
 			<div className="Price">
-				Product: {this.props.description}
+				Product Id: {this.props.productId}
+				<br/>
+				Product Description: {this.props.productDescription}
 				<br/>
 				Price: {this.props.price}
 				<br/>

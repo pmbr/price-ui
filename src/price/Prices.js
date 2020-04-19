@@ -61,7 +61,8 @@ class prices extends Component {
               return <Price 
                           key={price.id}
                           id={price.id}
-                          description={price.productDescription} 
+                          productId={price.productId} 
+                          productDescription={price.productDescription} 
                           price={price.price} 
                           startDate={price.startDate}
                           endDate={price.endDate}
