@@ -81,11 +81,11 @@ func get(w http.ResponseWriter, r *http.Request) {
 			if price.Id == id {
 				w.WriteHeader(http.StatusOK)
 				json.NewEncoder(w).Encode(price)
-				log.Print("get returned id ", id)
+				log.Print("get method - service returned price with id: ", id)
 				return
 			}
 		}
-		log.Print("get found no id ", id)
+		log.Print("get method - service could not find price with id: ", id)
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(Error{ErrorMessage: "no price found for id"})
 	}
@@ -93,57 +93,43 @@ func get(w http.ResponseWriter, r *http.Request) {
 
 func post(w http.ResponseWriter, r *http.Request) {
 	addResponseHeaders(w)
-	var postPrice Price
-	err := json.NewDecoder(r.Body).Decode(&postPrice)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(Error{ErrorMessage: "id payload body"})
-		log.Print("id payload body")
-		return
-	}
-	for _, price := range prices {
-		if price.Id == postPrice.Id {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(Error{ErrorMessage: "id duplicate"})
-			log.Print("id duplicate")
-			return
+	if postPrice, ok := convertRequestPayloadToPriceStruct(w, r); ok {
+		for _, price := range prices {
+			if price.Id == postPrice.Id {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(Error{ErrorMessage: "id duplicate"})
+				log.Print("post method - attempted to create new price with existing id: ", postPrice.Id)
+				return
+			}
 		}
+		prices = append(prices, postPrice)
+		log.Print("post method - created new price with id: ", postPrice.Id)
+		w.WriteHeader(http.StatusCreated)
 	}
-	prices = append(prices, postPrice)
-	log.Print("created id ", postPrice.Id)
-	w.WriteHeader(http.StatusCreated)
 }
 
 func put(w http.ResponseWriter, r *http.Request) {
 	addResponseHeaders(w)
 	if id, ok := extractIdFromPathParams(w, r); ok {
-		var putPrice Price
-		err := json.NewDecoder(r.Body).Decode(&putPrice)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(Error{ErrorMessage: "id payload body"})
-			log.Print("id payload body")
-			return
-		}
-		if id != putPrice.Id {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(Error{ErrorMessage: "request id and payload id must match"})
-			log.Print("request id and payload id do not match")
-			return
-		}
-		for index, price := range prices {
-			if price.Id == putPrice.Id {
-				prices = append(prices[:index], prices[index+1:]...)
-				prices = append(prices, putPrice)
-				log.Print("updated id ", id)
-				w.WriteHeader(http.StatusOK)
+		if putPrice, ok := convertRequestPayloadToPriceStruct(w, r); ok {
+			if id != putPrice.Id {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(Error{ErrorMessage: "request id and payload id must match"})
+				log.Print("request id and payload id do not match")
 				return
 			}
+			for index, price := range prices {
+				if price.Id == putPrice.Id {
+					prices[index] = putPrice
+					log.Print("updated id ", id)
+					w.WriteHeader(http.StatusOK)
+					return
+				}
+			}
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(Error{ErrorMessage: "no price found with id on request"})
+			log.Print("put method - no price found with id: ", putPrice.Id)
 		}
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(Error{ErrorMessage: "id not found"})
-		log.Print("update found no id")
-
 	}
 }
 
@@ -191,16 +177,27 @@ func extractIdFromPathParams(w http.ResponseWriter, r *http.Request) (int, bool)
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(Error{ErrorMessage: "id invalid"})
 			log.Print("received request with invalid id ", val)
-			return -1, false
+			return id, false
 		}
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(Error{ErrorMessage: "id required"})
 		log.Print("received request with id missing")
-		return -1, false
-
+		return id, false
 	}
 	return id, true
+}
+
+func convertRequestPayloadToPriceStruct(w http.ResponseWriter, r *http.Request) (Price, bool) {
+	var putPrice Price
+	err := json.NewDecoder(r.Body).Decode(&putPrice)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(Error{ErrorMessage: "invalid payload body"})
+		log.Print("invalid payload body")
+		return putPrice, false
+	}
+	return putPrice, true
 }
 
 func addResponseHeaders(w http.ResponseWriter) {
